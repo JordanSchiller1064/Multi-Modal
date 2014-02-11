@@ -6,7 +6,7 @@ public class Segment extends BaseClass {
 
 	private int id;
 	private int toID;
-	private int FromID;
+	private int fromID;
 	private int VehicleID;
 	private String mode;
 	private double distance;
@@ -16,7 +16,71 @@ public class Segment extends BaseClass {
 	
 	public Segment()
 	{
-		
+		MarkNew();
+	}
+	public Segment(int id)
+	{
+		this.id=id;
+	}
+
+	public int getID()
+	{
+		return id;
+	}
+	
+	public void setStartLocation(int id)
+	{
+		fromID=id;
+		startLocation = Location.Load(id);
+		MarkDirty();
+	}
+	public void setStartLocation(Location l)
+	{
+		startLocation=l;
+		fromID=startLocation.getID();
+		MarkDirty();
+	}
+	public int getStartLocationID()
+	{
+		return fromID;
+	}
+	public Location getStartLocation()
+	{
+		return startLocation;
+	}
+	
+	public void setEndLocation(int id)
+	{
+		toId=id;
+		endLocation=Location.Load(id);
+		MarkDirty();
+	}
+	public void setEndLocation(Location l)
+	{
+		endLocation=l;
+		toID=endLocation.getID();
+		MarkDirty();
+	}
+	public int getEndLocationID()
+	{
+		return toID;
+	}
+	public Location getEndLocation()
+	{
+		return endLocation;
+	}
+	
+	public void setVehicle(Vehicle v)
+	{
+		vehicleUsed=v;
+		VehicleID=vehicleUsed.getID();
+		MarkDirty();
+	}
+	public void setVehicle(int id)
+	{
+		VehicleID=v;
+		//vehicleUsed=Vehicle.
+		MarkDirty();
 	}
 	
 	public static ArrayList<Segment> LoadAll(String where)
