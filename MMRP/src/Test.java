@@ -15,7 +15,7 @@ public class Test extends BaseClass
 		{
 			Connection conn = getConnection();
 			Statement sql = conn.createStatement();
-			ResultSet rs = sql.executeQuery("Select * From Availability");
+			ResultSet rs = sql.executeQuery("Select * From Bike");
 			rs.next();
 			System.out.println("TESTING "+rs.getInt(1));
 		}
@@ -26,13 +26,13 @@ public class Test extends BaseClass
 	}
 	public static void main(String[] args)
 	{
-		Truck test = Truck.Load(1);
-		System.out.println(test.getVehicleName());
-		
-		ArrayList<Segment> sched =test.getSchedule();
-		for(int i = 0 ; i<sched.size();i++)
+		//Truck test = Truck.Load(1);
+		//System.out.println(test.getVehicleName());
+		ArrayList<Bike> b = Bike.LoadAll("");
+		//ArrayList<Segment> sched =test.getSchedule();
+		for(int i = 0 ; i<b.size();i++)
 		{
-			System.out.println(sched.get(i).getStart() + "\t" + sched.get(i).getEnd());
+			System.out.println(b.get(i).getBikeName() + "\t" );
 		}
 	}
 

@@ -21,14 +21,17 @@ public class Truck extends Vehicle {
 	public Truck()
 	{
 		setTravelType(TravelTypes.Truck);
+		MarkNew();
 	}	
-	public void setContractor(String s)
+	public Truck(int id)
 	{
-		super.setContractor(s);
-	}
+		setTravelType(TravelTypes.Truck);
+		this.id=id;
+	}	
+	
 	public void setTruckName(String s)
 	{
-		super.setVehicleName(s);
+			super.setVehicleName(s);
 	}
 	public String getTruckName()
 	{
@@ -36,11 +39,19 @@ public class Truck extends Vehicle {
 	}
 	public void setTruckType(TruckTypes s)
 	{
-		type = s;
+		if(this.type==null || !this.type.equals(s))
+		{
+			type = s;
+			MarkDirty();
+		}
 	}
 	public void setTruckType(String s)
 	{
-		type = loadTruckType(s);
+		if(this.type==null || !this.type.toString().equals(s))
+		{
+			type = loadTruckType(s);
+			MarkDirty();
+		}
 	}
 	public String getTruckType()
 	{
@@ -48,7 +59,7 @@ public class Truck extends Vehicle {
 	}
 	private TruckTypes loadTruckType(String s)
 	{
-		if(s.equals(TruckTypes.Semi))
+		if(s.equals(TruckTypes.Semi.toString()))
 			return TruckTypes.Semi;
 		return TruckTypes.Other;
 			
@@ -89,7 +100,7 @@ public class Truck extends Vehicle {
 		try 
 		{
 			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Truck");
+			ResultSet rs = c.createStatement().executeQuery("Select * from Truck " +where );
 			while(rs.next())
 				returnList.add(BuildFromDataRow(rs));
 		}
@@ -101,8 +112,8 @@ public class Truck extends Vehicle {
 	}
 	public static Truck BuildFromDataRow(ResultSet rs) throws SQLException
 	{
-		Truck t = new Truck();
-		t.setId(rs.getInt("TruckID"));
+		Truck t = new Truck(rs.getInt("TruckID"));
+		//t.setId();
 		t.setTruckName(rs.getString("TruckName"));
 		t.setCapacity(rs.getInt("Capacity"));
 		t.setContractor(rs.getString("Contractor"));

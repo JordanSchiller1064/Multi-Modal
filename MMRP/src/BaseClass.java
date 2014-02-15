@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.io.*;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 public abstract class BaseClass {
