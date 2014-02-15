@@ -28,17 +28,76 @@ public class Segment extends BaseClass {
 		return id;
 	}
 	
+	public void setDistance(double d)
+	{
+		if(this.distance!=d)
+		{
+			distance=d;
+			MarkDirty();
+		}
+	}
+	public double getDistance()
+	{
+		return this.distance;
+	}
+	
+	public void setCost(double c)
+	{
+		if(this.cost!=c)
+		{
+			this.cost=c;
+			MarkDirty();
+		}
+	}
+	
+	public double getCost()
+	{
+		return this.cost;
+	}
+	
+	public void setArrivalTime(int t)
+	{
+		if(this.arrivalTime!=t)
+		{
+			arrivalTime=t;
+			MarkDirty();
+		}
+	}
+	
+	public int getArrivalTime()
+	{
+		return this.arrivalTime;
+	}
+	
+	public void setDepartureTime(int t)
+	{
+		if(this.departureTime!=t)
+		{
+			this.departureTime=t;
+			MarkDirty();
+		}
+	}
+	
+	public int getDepartureTime()
+	{
+		return this.departureTime;
+	}
+	
 	public void setStartLocation(int id)
 	{
-		fromID=id;
-		startLocation = Location.Load(id);
-		MarkDirty();
+		if(fromID!=id)
+		{
+			fromID=id;
+			MarkDirty();
+		}
 	}
 	public void setStartLocation(Location l)
 	{
-		startLocation=l;
-		fromID=startLocation.getID();
-		MarkDirty();
+		if(fromID!=l.getID())
+		{
+			fromID=l.getID();
+			MarkDirty();
+		}
 	}
 	public int getStartLocationID()
 	{
@@ -46,20 +105,24 @@ public class Segment extends BaseClass {
 	}
 	public Location getStartLocation()
 	{
-		return startLocation;
+		return Location.Load(fromID);
 	}
 	
 	public void setEndLocation(int id)
 	{
-		toId=id;
-		endLocation=Location.Load(id);
-		MarkDirty();
+		if(toID!=id)
+		{
+			toID=id;
+			MarkDirty();
+		}
 	}
 	public void setEndLocation(Location l)
 	{
-		endLocation=l;
-		toID=endLocation.getID();
-		MarkDirty();
+		if(toID!=l.getID())
+		{
+			toID=l.getID();
+			MarkDirty();
+		}
 	}
 	public int getEndLocationID()
 	{
@@ -67,22 +130,46 @@ public class Segment extends BaseClass {
 	}
 	public Location getEndLocation()
 	{
-		return endLocation;
+		return Location.Load(toID);
 	}
 	
 	public void setVehicle(Vehicle v)
 	{
-		vehicleUsed=v;
-		VehicleID=vehicleUsed.getID();
-		MarkDirty();
+		if(this.VehicleID!=v.getId() || this.mode==null || !this.mode.equals(v.getTravelType()))
+		{
+			this.VehicleID=v.getId();
+			mode=v.getTravelType();
+			MarkDirty();
+		}
 	}
-	public void setVehicle(int id)
+	public void setVehicle(int id,String travelMode)
 	{
-		VehicleID=v;
-		//vehicleUsed=Vehicle.
-		MarkDirty();
+		//todo:ADD check on travel mode: if not exist do nothing
+		if(this.VehicleID!=id || this.mode==null || !this.mode.equals(travelMode))
+		{
+			this.VehicleID=id;
+			mode=travelMode;
+			MarkDirty();
+		}
 	}
-	
+	public Vehicle getVehcle()
+	{
+		switch(Vehicle.loadType(mode))
+		{
+			case Truck:
+				return Truck.Load(this.VehicleID);
+			case Rail:
+				return Rail.Load(this.VehicleID);
+			case Cargo:
+				return Cargo.Load(this.VehicleID);
+			case Plane:
+				return Plane.Load(this.VehicleID);
+			case Bike:
+				return Bike.Load(this.VehicleID);
+		
+		}
+		return null;
+	}
 	public static ArrayList<Segment> LoadAll(String where)
 	{
 		ArrayList<Segment> returnList = new ArrayList<Segment>();
@@ -103,38 +190,76 @@ public class Segment extends BaseClass {
 		}
 		return returnList;
 	}
-	public static Segment BuildFromDataRow(ResultSet rs)
+	public static Segment BuildFromDataRow(ResultSet rs) throws SQLException
 	{
-		Segment s = new Segment();
-		try 
+		Segment s = new Segment(rs.getInt("SegmentID"));
+		//s.id=;
+		s.setStartLocation(rs.getInt("FromLocationID"));
+		//s.fromID=rs.getInt("FromLocationID");
+		s.setEndLocation(rs.getInt("ToLocationID"));
+		//s.toID=rs.getInt("ToLocationID");
+		//s.VehicleID=rs.getInt("VehicleID");
+		s.setVehicle(rs.getInt("VehicleID"), rs.getString("ModeType"));
+		//s.mode=rs.getString("ModeType");
+		//s.distance=rs.getDouble("Distance");
+		s.setDistance(rs.getDouble("Distance"));
+		s.setCost(rs.getDouble("Cost"));
+		//s.cost=rs.getDouble("Cost");
+		s.setDepartureTime(rs.getInt("TimeOfDeparture"));
+		//s.departureTime=rs.getInt("TimeOfDeparture");
+		//s.arrivalTime=rs.getInt("TimeOfArrival");
+		s.setArrivalTime(rs.getInt("TimeOfArrival"));
+		s.MarkClean();
+		return s;
+	}
+	
+	public static ArrayList<Segment> LoadAllAtLocation(Location l)
+	{
+		ArrayList<Segment> returnList = new ArrayList<Segment>();
+		try
 		{
-			s.id=rs.getInt("SegmentID");
-			s.FromID=rs.getInt("FromLocationID");
-			s.toID=rs.getInt("ToLocationID");
-			s.VehicleID=rs.getInt("VehicleID");
-			s.mode=rs.getString("ModeType");
-			s.distance=rs.getDouble("Distance");
-			s.cost=rs.getDouble("Cost");
-			s.departureTime=rs.getInt("TimeOfDeparture");
-			s.arrivalTime=rs.getInt("TimeOfArrival");
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Segment where FromLocationID = '" + l.getID() +"'");
+			while(rs.next())
+				returnList.add(BuildFromDataRow(rs));
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Error " + ex);
 		}
-		return s;
+		return returnList;
 	}
-	public int getStart()
+	
+	public static ArrayList<Segment> LoadAllAtLocation(Location l, int startTime)
 	{
-		return this.FromID;
+		ArrayList<Segment> returnList = new ArrayList<Segment>();
+		try
+		{
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Segment where FromLocationID = '" + l.getID() + "' and TimeOfDeparture > " + startTime);
+			while(rs.next())
+				returnList.add(BuildFromDataRow(rs));
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		return returnList;
 	}
-	public int getEnd()
-	{
-		return this.toID;
-	}
+	
 	@Override
 	void Update() {
-		// TODO Auto-generated method stub
+		if(isNew())
+		{
+		
+		}
+		else
+		{
+			if(isDirty())
+			{
+				
+			}
+		}
 
 	}
 
@@ -146,7 +271,7 @@ public class Segment extends BaseClass {
 	@Override
 	public String toString()
 	{
-		return this.FromID + "   " + this.toID;
+		return this.fromID + "   " + this.toID;
 	}
 
 }

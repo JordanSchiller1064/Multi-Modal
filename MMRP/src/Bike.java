@@ -1,0 +1,201 @@
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class Bike extends Vehicle {
+	public static enum BikeType 
+	{
+			Standard("Standard"),
+			Other("OTHER");
+			private String type;
+			BikeType(String s)
+			{
+				type=s;
+			}
+			@Override public String toString()
+			{
+				return type;
+			}
+			
+	}
+	private BikeType type;
+	public Bike()
+	{
+		setTravelType(TravelTypes.Bike);
+		MarkNew();
+	}	
+	public Bike(int id)
+	{
+		setTravelType(TravelTypes.Bike);
+		this.id=id;
+	}	
+	
+	public void setBikeName(String s)
+	{
+		if(name==null || !this.name.equals(s))
+		{
+			super.setVehicleName(s);
+		}
+		
+	}
+	public String getBikeName()
+	{
+		return super.getVehicleName();
+	}
+	public void setBikeType(BikeType s)
+	{
+		if(type==null || !this.type.equals(s))
+		{
+			type = s;
+			MarkDirty();
+		}
+	}
+	public void setBikeType(String s)
+	{
+		if(type==null || !this.type.toString().equals(s))
+		{
+			type = loadBikeType(s);
+			MarkDirty();
+		}
+	}
+	public String getBikeType()
+	{
+		return type.toString();
+	}
+	private BikeType loadBikeType(String s)
+	{
+		if(s.equals(BikeType.Standard.toString()))
+			return BikeType.Standard;
+		return BikeType.Other;
+			
+	}
+/*
+ * 
+ *   public void Update()
+    {
+    	if(IsNew())
+    	{
+    		execute("Insert into Segment (StartNode, EndNode) Values ('" + this.startNodeID + "', '" + this.endNodeID + "')");
+    		
+    		String query = "Select * from Segment Where StartNode =" + this.startNodeID + " and EndNode =" + this.endNodeID;
+        	ResultSet rs= execute(query);
+        	try
+        	{
+        		rs.next();
+        		this.setSID(rs.getInt("SegmentID"));
+        	}
+        	catch(Exception ex)
+        	{
+        		System.out.println("Error "+ex);
+        	}
+        	MarkClean();
+    		MarkOld();
+    	}
+    	else
+    	{
+    		if(IsDirty())
+    		{
+    			execute("Update Segment Set StartNode = '" +this.startNodeID +
+    					"' AND EndNode = '" + this.endNodeID + "' Where SegmentID = '"+ this.sid + "'");
+    			MarkClean();
+    		}
+    	}
+    	close();
+    }
+    public void Delete()
+    {
+    	execute("Delete from Segment Where SegmentID =" + this.sid);
+    	close();
+    }
+ * (non-Javadoc)
+ * @see Vehicle#Update()
+ */
+	@Override
+	public void Update() 
+	{
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
+			{
+				getConnection().createStatement().execute("Insert into Bike (BikeName,Contractor,Longitude,Latitude,LocationName,BikeType,Capacity,Status) Values ('"+
+						getBikeName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getBikeType()+ "','"+
+						this.getCapacity()+"','"+this.getStatus()+"')");
+			}
+			else
+			{
+				if(isDirty())
+				{
+					
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		
+	}
+
+	@Override
+	public  void Delete() 
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	public static Bike Load(int id)
+	{
+		try
+		{
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Bike where BikeID = " + id);
+			if(rs.next())
+				return BuildFromDataRow(rs);
+			return null;
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+ 		return null;
+	}
+	public static ArrayList<Bike> LoadAll(String where)
+	{
+		ArrayList<Bike> returnList = new ArrayList<Bike>();
+		try 
+		{
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Bike " +  where);
+			while(rs.next())
+				returnList.add(BuildFromDataRow(rs));
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		return returnList;
+	}
+	public static Bike BuildFromDataRow(ResultSet rs) throws SQLException
+	{
+		Bike b = new Bike(rs.getInt("BikeID"));
+		//b.setId();
+		b.setBikeName(rs.getString("BikeName"));
+		b.setCapacity(rs.getInt("Capacity"));
+		b.setContractor(rs.getString("Contractor"));
+		b.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
+		b.setBikeType(rs.getString("BikeType"));
+		b.setStatus(rs.getString("Status"));		
+		b.MarkClean();
+		return b;
+		
+	}
+	@Override
+	public String toString()
+	{
+		return getBikeName();
+	}
+
+
+}

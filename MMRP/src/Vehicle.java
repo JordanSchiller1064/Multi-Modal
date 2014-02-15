@@ -67,15 +67,21 @@ public abstract class Vehicle extends BaseClass {
 	
 	public void setTravelType(TravelTypes t)
 	{
-		type=t;
-		MarkDirty();
+		if(type==null || !type.equals(t))
+		{
+			type=t;
+			MarkDirty();
+		}
 	}
 	public void setTravelType(String t)
 	{
-		type = loadType(t);
-		MarkDirty();
+		if(type==null || !type.toString().equals(t))
+		{
+			type = loadType(t);
+			MarkDirty();
+		}
 	}	
-	private TravelTypes loadType(String t)
+	public static TravelTypes loadType(String t)
 	{
 		if(t.equals(TravelTypes.Bike.toString()))
 			return TravelTypes.Bike;
@@ -89,7 +95,7 @@ public abstract class Vehicle extends BaseClass {
 			return TravelTypes.Truck;
 		return null;
 	}
-	private String getTravelType()
+	public String getTravelType()
 	{
 		return type.toString();
 	}
@@ -105,23 +111,27 @@ public abstract class Vehicle extends BaseClass {
 	}
 	public void setStatus(Status s)
 	{
-		status=s;
-		MarkDirty();
+		if(status == null || status!=(s))
+		{
+			status=s;
+			MarkDirty();
+		}
 	}
 	public void setStatus(String s)
 	{
+		if(status==null || !status.toString().equals(s));
 		status=loadStatus(s);
 		MarkDirty();
 	}
-	private Status loadStatus(String val)
+	public static Status loadStatus(String val)
 	{
-		if(val.equals(Status.Delayed))
+		if(val.equals(Status.Delayed.toString()))
 		{
 			return Status.Delayed;
 		}
 		else
 		{
-			if(val.equals(Status.Disabled))
+			if(val.equals(Status.Disabled.toString()))
 			{
 				return Status.Disabled;
 			}
@@ -131,36 +141,42 @@ public abstract class Vehicle extends BaseClass {
 			}
 		}
 	}
-	private String getStatus()
+	public String getStatus()
 	{
 		return status.toString();
 	}
 	
 	public void setContractor(Contractors c)
 	{
-		contractor=c;
-		MarkDirty();
+		if(contractor==null || !contractor.equals(c))
+		{
+			contractor=c;
+			MarkDirty();
+		}
 	}
 	public void setContractor(String c)
 	{
-		contractor=loadContractor(c);
-		MarkDirty();
+		if(contractor==null || !contractor.toString().equals(c))
+		{
+			contractor=loadContractor(c);
+			MarkDirty();
+		}
 	}
-	private Contractors loadContractor(String val)
+	public static Contractors loadContractor(String val)
 	{
-		if(val.equals(Contractors.DHL))
+		if(val.equals(Contractors.DHL.toString()))
 		{
 			return Contractors.DHL;
 		}
 		else
 		{
-			if(val.equals(Contractors.FedEX))
+			if(val.equals(Contractors.FedEX.toString()))
 			{
 				return Contractors.FedEX;
 			}
 			else
 			{
-				if(val.equals(Contractors.UPS))
+				if(val.equals(Contractors.UPS.toString()))
 				{
 					return Contractors.UPS;
 				}
@@ -169,34 +185,46 @@ public abstract class Vehicle extends BaseClass {
 			}
 		}
 	}
-	private String getContractor()
+	public String getContractor()
 	{
 		return contractor.toString();
 	}
 	
 	public void setLocation(double lat, double lon, String name)
 	{
-		latitude=lat;
-		longitude=lon;
-		locationName=name;
-		MarkDirty();
+		if(this.latitude!=lat || this.longitude!=lon || this.locationName==null ||!this.locationName.equals(name))
+		{
+			latitude=lat;
+			longitude=lon;
+			locationName=name;
+			MarkDirty();
+		}
 	}	
 	public void setLocation(double lat, double lon)
 	{
-		latitude=lat;
-		longitude=lon;
-		locationName="";
-		MarkDirty();
+		if(this.latitude!=lat || this.longitude!=lon)
+		{
+			latitude=lat;
+			longitude=lon;
+			locationName="";
+			MarkDirty();
+		}
 	}	
 	public void setLongitude(double lon)
 	{
-		longitude=lon;
-		MarkDirty();
+		if(this.longitude!=lon)
+		{
+			longitude=lon;
+			MarkDirty();
+		}
 	}
 	public void setLatitude(double lat)
 	{
-		this.latitude=lat;
-		MarkDirty();
+		if(this.latitude!=lat)
+		{
+			this.latitude=lat;
+			MarkDirty();
+		}
 	}
 	public double getLongitude()
 	{
@@ -208,18 +236,24 @@ public abstract class Vehicle extends BaseClass {
 	}
 	public void setLocationName(String name)
 	{
-		this.locationName=name;
-		MarkDirty();
+		if(this.locationName==null || !this.locationName.equals(name))
+		{
+			this.locationName=name;
+			MarkDirty();
+		}
 	}
 	public String getLocationName()
 	{
 		return locationName;
 	}
 	
-	public void setVehicleName(String name)
+	protected void setVehicleName(String name)
 	{
-		this.name=name;
-		MarkDirty();
+		if(this.name==null || !this.name.equals(name) )
+		{
+			this.name=name;
+			MarkDirty();
+		}
 	}
 	protected String getVehicleName()
 	{
@@ -227,8 +261,11 @@ public abstract class Vehicle extends BaseClass {
 	}
 	public void setCapacity(int capac)
 	{
-		capacity=capac;
-		MarkDirty();
+		if(capacity!=capac)
+		{
+			capacity=capac;
+			MarkDirty();
+		}
 	}
 	public int getCapacity()
 	{
