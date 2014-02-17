@@ -1,7 +1,7 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Plane extends Vehicle {
 
@@ -74,14 +74,54 @@ public class Plane extends Vehicle {
 	@Override
 	public void Update() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
+			{
+				executeCommand("Insert into Plane (PlaneName,Contractor,Longitude,Latitude,LocationName,PlaneType,Capacity,Status) Values ('"+
+						getPlaneName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getPlaneType()+ "','"+
+						this.getCapacity()+"','"+this.getStatus()+"')");
+				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select PlaneID from Plane where PlaneName = '" + this.getPlaneName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND PlaneType = '" + this.getPlaneType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus()+"'");
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("PlaneID");
+					MarkClean();
+					MarkOld();
+				}
+			}
+			else
+			{
+				if(isDirty())
+				{
+					executeCommand("Update Plane Set PlaneName = '" + this.getPlaneName() + "' , Contractor = '"+this.getContractor()+
+						"' , Longitude = '" + this.getLongitude() + "' , Latitude = '" + this.getLatitude() + "' , LocationName = '" + this.getLocationName() + 
+						"' , PlaneType = '" + this.getPlaneType() + "' , Capacity = '" +this.getCapacity() + "' , Status = '" + this.getStatus() + "' Where Plane = " +this.id);
+					MarkClean();
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 		
 	}
 
 	@Override
 	public  void Delete() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			executeCommand("Delete from Plane Where PlaneID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 
 	}
 
@@ -89,10 +129,9 @@ public class Plane extends Vehicle {
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Plane where PlaneID = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp= executeQuery("Select * from Plane where PlaneID = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -106,10 +145,9 @@ public class Plane extends Vehicle {
 		ArrayList<Plane> returnList = new ArrayList<Plane>();
 		try 
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Plane " +  where);
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Plane " +  where);
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -117,16 +155,15 @@ public class Plane extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Plane BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Plane BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Plane p = new Plane(rs.getInt("PlaneID"));
-		//b.setId();
-		p.setPlaneName(rs.getString("PlaneName"));
-		p.setCapacity(rs.getInt("Capacity"));
-		p.setContractor(rs.getString("Contractor"));
-		p.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
-		p.setPlaneType(rs.getString("PlaneType"));
-		p.setStatus(rs.getString("Status"));		
+		Plane p = new Plane((Integer)data.get("PlaneID"));//rs.getInt("BikeID"));
+		p.setPlaneName((String)data.get("PlaneName"));//rs.getString("BikeName"));
+		p.setCapacity((Integer)data.get("Capacity"));//rs.getInt("Capacity"));
+		p.setContractor((String)data.get("Contractor"));//rs.getString("Contractor"));
+		p.setLocation(Double.parseDouble(data.get("Latitude").toString()),Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));
+		p.setPlaneType((String)data.get("PlaneType"));//rs.getString("BikeType"));
+		p.setStatus((String)data.get("Status"));//rs.getString("Status"));		
 		p.MarkClean();
 		return p;
 		

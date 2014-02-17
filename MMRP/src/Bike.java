@@ -1,7 +1,6 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Bike extends Vehicle {
 	public static enum BikeType 
@@ -70,47 +69,7 @@ public class Bike extends Vehicle {
 		return BikeType.Other;
 			
 	}
-/*
- * 
- *   public void Update()
-    {
-    	if(IsNew())
-    	{
-    		execute("Insert into Segment (StartNode, EndNode) Values ('" + this.startNodeID + "', '" + this.endNodeID + "')");
-    		
-    		String query = "Select * from Segment Where StartNode =" + this.startNodeID + " and EndNode =" + this.endNodeID;
-        	ResultSet rs= execute(query);
-        	try
-        	{
-        		rs.next();
-        		this.setSID(rs.getInt("SegmentID"));
-        	}
-        	catch(Exception ex)
-        	{
-        		System.out.println("Error "+ex);
-        	}
-        	MarkClean();
-    		MarkOld();
-    	}
-    	else
-    	{
-    		if(IsDirty())
-    		{
-    			execute("Update Segment Set StartNode = '" +this.startNodeID +
-    					"' AND EndNode = '" + this.endNodeID + "' Where SegmentID = '"+ this.sid + "'");
-    			MarkClean();
-    		}
-    	}
-    	close();
-    }
-    public void Delete()
-    {
-    	execute("Delete from Segment Where SegmentID =" + this.sid);
-    	close();
-    }
- * (non-Javadoc)
- * @see Vehicle#Update()
- */
+
 	@Override
 	public void Update() 
 	{
@@ -119,15 +78,28 @@ public class Bike extends Vehicle {
 			//toDo: set id on insert set update statement
 			if(isNew())
 			{
-				getConnection().createStatement().execute("Insert into Bike (BikeName,Contractor,Longitude,Latitude,LocationName,BikeType,Capacity,Status) Values ('"+
+				executeCommand("Insert into Bike (BikeName,Contractor,Longitude,Latitude,LocationName,BikeType,Capacity,Status) Values ('"+
 						getBikeName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getBikeType()+ "','"+
 						this.getCapacity()+"','"+this.getStatus()+"')");
+				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select BikeID from Bike where BikeName = '" + this.getBikeName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND BikeType = '" + this.getBikeType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus()+"'");
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("BikeID");
+					MarkClean();
+					MarkOld();
+				}
 			}
 			else
 			{
 				if(isDirty())
 				{
-					
+					executeCommand("Update Bike Set BikeName = '" + this.getBikeName() + "' , Contractor = '"+this.getContractor()+
+						"' , Longitude = '" + this.getLongitude() + "' , Latitude = '" + this.getLatitude() + "' , LocationName = '" + this.getLocationName() + 
+						"' , BikeType = '" + this.getBikeType() + "' , Capacity = '" +this.getCapacity() + "' , Status = '" + this.getStatus() + "' Where BikeID = " +this.id);
+					MarkClean();
 				}
 			}
 		}
@@ -141,7 +113,14 @@ public class Bike extends Vehicle {
 	@Override
 	public  void Delete() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			executeCommand("Delete from Bike Where BikeID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 
 	}
 
@@ -149,10 +128,9 @@ public class Bike extends Vehicle {
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Bike where BikeID = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Bike where BikeID = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -166,10 +144,10 @@ public class Bike extends Vehicle {
 		ArrayList<Bike> returnList = new ArrayList<Bike>();
 		try 
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Bike " +  where);
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			
+			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Bike " +  where);
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -177,16 +155,15 @@ public class Bike extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Bike BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Bike BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Bike b = new Bike(rs.getInt("BikeID"));
-		//b.setId();
-		b.setBikeName(rs.getString("BikeName"));
-		b.setCapacity(rs.getInt("Capacity"));
-		b.setContractor(rs.getString("Contractor"));
-		b.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
-		b.setBikeType(rs.getString("BikeType"));
-		b.setStatus(rs.getString("Status"));		
+		Bike b = new Bike((Integer)data.get("BikeID"));//rs.getInt("BikeID"));
+		b.setBikeName((String)data.get("BikeName"));//rs.getString("BikeName"));
+		b.setCapacity((Integer)data.get("Capacity"));//rs.getInt("Capacity"));
+		b.setContractor((String)data.get("Contractor"));//rs.getString("Contractor"));
+		b.setLocation(Double.parseDouble(data.get("Latitude").toString()),Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));
+		b.setBikeType((String)data.get("BikeType"));//rs.getString("BikeType"));
+		b.setStatus((String)data.get("Status"));//rs.getString("Status"));		
 		b.MarkClean();
 		return b;
 		

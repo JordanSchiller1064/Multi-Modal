@@ -1,5 +1,3 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 public class Location extends BaseClass {
@@ -73,7 +71,7 @@ public class Location extends BaseClass {
 	
 	public void setName(String s)
 	{
-		if(!name.equals(s))
+		if(name==null || !name.equals(s))
 		{
 			name=s;
 			MarkDirty();
@@ -85,35 +83,85 @@ public class Location extends BaseClass {
 		return name;
 	}
 	
+
 	@Override
-	void Update() {
+	public void Update() 
+	{
+		try
+		{
 		if(isNew())
 		{
+			String sql ="Insert into Location (Name,Latitude,Longitude,TravelType1";
 			
+			for(int i =1;i<travelTypes.size();i++)
+				sql+=",TravelType"+(i+1);
+		
+			sql+=") Values ('" + this.getName() +"','"+this.latitude+"','"+this.longitude + "','"+travelTypes.get(0).toString()+"'";
+			
+			for(int i =1;i<travelTypes.size();i++)
+				sql+=",'"+travelTypes.get(i).toString()+"'";
+			
+			sql+=")";
+			
+			executeCommand(sql);
+			
+			sql="Select LocationID from Location where Name = '"+ this.name +"' AND Latitude ='"+this.latitude+"' AND Longitude = '"+ this.longitude + "' TravelType1 ='"+ travelTypes.get(0).toString()+"'";
+			for(int i =1;i<travelTypes.size();i++)
+				sql+=" AND TravelType"+(i+1)+"='"+travelTypes.get(i).toString()+"'";
+			
+			ArrayList<Map<String,Object>> temp =executeQuery(sql);
+			if(temp.size()>0)
+			{
+				this.id = (Integer)temp.get(0).get("ShipID");
+				
+			}
+			MarkClean();
+			MarkOld();
 		}
 		else
 		{
 			if(isDirty())
 			{
+				String sql ="Update Location Set Name = '" + this.getName() + "' , Latitude = '"+this.getLatitude()+
+						"' , Longitude = '" + this.getLongitude() + "' , TravelType1 = '" + this.travelTypes.get(0).toString()+ "'";
+				for(int i = 1; i< this.travelTypes.size();i++)
+				{
+					sql+= " , TravelType"+(i+1)+" = '" + travelTypes.get(i).toString() + "'";
+				}
 				
+				sql += " Where LocationID = "+this.id;
+				executeCommand(sql);
+				MarkClean();
 			}
 		}
-
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		
 	}
 
 	@Override
-	void Delete() {
-		// TODO Auto-generated method stub
+	public  void Delete() 
+	{
+		try
+		{
+			executeCommand("Delete From location where locationID = " + id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error "+ ex);
+		}
 
 	}
 	public static Location Load(int id)
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Location where LocationId = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Location where LocationId = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -128,10 +176,9 @@ public class Location extends BaseClass {
 		ArrayList<Location> temp = new ArrayList<Location>();
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Location " + where);
-			while(rs.next())
-				temp.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> data = executeQuery("Select * from Location " + where);
+			for(int i = 0 ;i< temp.size();i++)
+				temp.add(BuildFromDataRow(data.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -139,30 +186,29 @@ public class Location extends BaseClass {
 		}
 		return temp;
 	}
-	private static Location BuildFromDataRow(ResultSet rs)throws SQLException
+	private static Location BuildFromDataRow(Map<String,Object> data)throws SQLException
 	{
-		Location temp = new Location(rs.getInt("LocationId"));
-		temp.setLatitude(rs.getDouble("Latitude"));
-		temp.setLongitude(rs.getDouble("Longitude"));
-		if(rs.getString("Name")!=null)
-			temp.setName(rs.getString("Name"));
-		temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType1")));
-		if(rs.getString("TravelType2")!=null)
+		Location temp = new Location((Integer)data.get("LocationId"));
+		temp.setLatitude(Double.parseDouble(data.get("Latitude").toString()));
+		temp.setLongitude(Double.parseDouble(data.get("Longitude").toString()));
+		temp.setName((String)data.get("Name"));//rs.getString("Name"));
+		temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType1")));//rs.getString("TravelType1")));
+		if((String)data.get("TravelType2")!=null)
 		{
-			temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType2")));
-			if(rs.getString("TravelType3")!=null)
+			temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType1")));
+			if((String)data.get("TravelType3")!=null)
 			{
-				temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType3")));
-				if(rs.getString("TravelType4")!=null)
+				temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType3")));
+				if((String)data.get("TravelType4")!=null)
 				{
-					temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType4")));
+					temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType4")));
 				}
-				if(rs.getString("TravelType5")!=null)
+				if((String)data.get("TravelType5")!=null)
 				{
-					temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType5")));
-					if(rs.getString("TravelType6")!=null)
+					temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType5")));
+					if((String)data.get("TravelType6")!=null)
 					{
-						temp.addTravelMode(Vehicle.loadType(rs.getString("TravelType6")));
+						temp.addTravelMode(Vehicle.loadType((String)data.get("TravelType6")));
 					}
 				}
 			}

@@ -1,4 +1,4 @@
-import java.sql.*;
+
 import java.util.ArrayList;
 public class Test extends BaseClass 
 {
@@ -11,29 +11,20 @@ public class Test extends BaseClass
 	public void Delete(){};
 	public void printRandmonness()
 	{
-		try
-		{
-			Connection conn = getConnection();
-			Statement sql = conn.createStatement();
-			ResultSet rs = sql.executeQuery("Select * From Bike");
-			rs.next();
-			System.out.println("TESTING "+rs.getInt(1));
-		}
-		catch(Exception ex)
-		{
-			System.out.println("ERROR" + ex);
-		}
+
 	}
 	public static void main(String[] args)
 	{
 		//Truck test = Truck.Load(1);
 		//System.out.println(test.getVehicleName());
-		ArrayList<Bike> b = Bike.LoadAll("");
+		ArrayList<Truck> b = Truck.LoadAll("");
+
 		//ArrayList<Segment> sched =test.getSchedule();
 		for(int i = 0 ; i<b.size();i++)
 		{
-			System.out.println(b.get(i).getBikeName() + "\t" );
+			System.out.println(b.get(i).getTruckName() + "\t" );
 		}
+		
 	}
 
 }

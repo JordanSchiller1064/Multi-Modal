@@ -65,7 +65,7 @@ public abstract class Vehicle extends BaseClass {
 	protected TravelTypes type;
 	protected int id;
 	
-	public void setTravelType(TravelTypes t)
+	protected void setTravelType(TravelTypes t)
 	{
 		if(type==null || !type.equals(t))
 		{
@@ -73,7 +73,7 @@ public abstract class Vehicle extends BaseClass {
 			MarkDirty();
 		}
 	}
-	public void setTravelType(String t)
+	protected void setTravelType(String t)
 	{
 		if(type==null || !type.toString().equals(t))
 		{

@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Map;
 public class Truck extends Vehicle {
 
 	public static enum TruckTypes 
@@ -67,14 +68,54 @@ public class Truck extends Vehicle {
 	@Override
 	public void Update() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
+			{
+				executeCommand("Insert into Truck (TruckName,Contractor,Longitude,Latitude,LocationName,TruckType,Capacity,Status) Values ('"+
+						getTruckName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getTruckType()+ "','"+
+						this.getCapacity()+"','"+this.getStatus()+"')");
+				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select TruckID from Truck where TruckName = '" + this.getTruckName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND TruckType = '" + this.getTruckType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus()+"'");
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("TruckID");
+					MarkClean();
+					MarkOld();
+				}
+			}
+			else
+			{
+				if(isDirty())
+				{
+					executeCommand("Update Truck Set TruckName = '" + this.getTruckName() + "' , Contractor = '"+this.getContractor()+
+						"' , Longitude = '" + this.getLongitude() + "' , Latitude = '" + this.getLatitude() + "' , LocationName = '" + this.getLocationName() + 
+						"' , TruckType = '" + this.getTruckType() + "' , Capacity = '" +this.getCapacity() + "' , Status = '" + this.getStatus() + "' Where TruckID = " +this.id);
+					MarkClean();
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 		
 	}
 
 	@Override
 	public  void Delete() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			executeCommand("Delete from Truck Where TruckID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 
 	}
 
@@ -82,10 +123,9 @@ public class Truck extends Vehicle {
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Truck where TruckId = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Truck where TruckId = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -99,10 +139,9 @@ public class Truck extends Vehicle {
 		ArrayList<Truck> returnList = new ArrayList<Truck>();
 		try 
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Truck " +where );
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Truck " +where );
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -110,16 +149,15 @@ public class Truck extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Truck BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Truck BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Truck t = new Truck(rs.getInt("TruckID"));
-		//t.setId();
-		t.setTruckName(rs.getString("TruckName"));
-		t.setCapacity(rs.getInt("Capacity"));
-		t.setContractor(rs.getString("Contractor"));
-		t.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
-		t.setTruckType(rs.getString("TruckType"));
-		t.setStatus(rs.getString("Status"));		
+		Truck t = new Truck((Integer)data.get("TruckID"));
+		t.setTruckName((String)data.get("TruckName"));//data;//rs.getString("TruckName"));
+		t.setCapacity((Integer)data.get("Capacity"));//rs.getInt("Capacity"));
+		t.setContractor((String)data.get("Contractor"));//rs.getString("Contractor"));
+		t.setLocation(Double.parseDouble(data.get("Latitude").toString()),Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));//,rs.getString("LocationName"));
+		t.setTruckType((String)data.get("TruckType"));//rs.getString("TruckType"));
+		t.setStatus((String)data.get("Status"));//rs.getString("Status"));		
 		t.MarkClean();
 		return t;
 		

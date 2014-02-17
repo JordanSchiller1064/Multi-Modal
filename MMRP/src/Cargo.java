@@ -1,7 +1,6 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 
 
@@ -89,14 +88,55 @@ public class Cargo extends Vehicle {
 	@Override
 	public void Update() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+		if(isNew())
+		{
+			executeCommand("Insert into Ship (ShipName,Contractor,Longitude,Latitude,LocationName,ShipType,Capacity,Status,NoOfContainers) Values ('"+
+					getCargoName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getCargoType()+ "','"+
+					this.getCapacity()+"','"+this.getStatus()+"','"+this.getNumOfContainers()+"')");
+			
+			ArrayList<Map<String,Object>> temp =executeQuery("Select ShipID from Ship where ShipName = '" + this.getCargoName() + "' AND Contractor = '"+this.getContractor()+
+					"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+					"' AND ShipType = '" + this.getCargoType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus()+ "' AND NoOfContainers = '" + this.getNumOfContainers()+"'");
+			if(temp.size()>0)
+			{
+				this.id = (Integer)temp.get(0).get("ShipID");
+				
+			}
+			MarkClean();
+			MarkOld();
+		}
+		else
+		{
+			if(isDirty())
+			{
+				executeCommand("Update Ship Set ShipName = '" + this.getCargoName() + "' , Contractor = '"+this.getContractor()+
+					"' , Longitude = '" + this.getLongitude() + "' , Latitude = '" + this.getLatitude() + "' , LocationName = '" + this.getLocationName() + 
+					"' , ShipType = '" + this.getCargoType() + "' , Capacity = '" +this.getCapacity() + "' , Status = '" + this.getStatus() +
+					"' , NoOfContainers ='" + this.getNumOfContainers()+"' Where ShipID = " +this.id);
+				MarkClean();
+			}
+		}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 		
 	}
 
 	@Override
 	public  void Delete() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			executeCommand("Delete From ship where ShipID = " + id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error "+ ex);
+		}
 
 	}
 
@@ -104,10 +144,9 @@ public class Cargo extends Vehicle {
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from ship where ShipID = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from ship where ShipID = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -121,10 +160,11 @@ public class Cargo extends Vehicle {
 		ArrayList<Cargo> returnList = new ArrayList<Cargo>();
 		try 
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from ship " +  where);
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from ship " +  where);
+			for(int i = 0 ; i<temp.size();i++)
+			{
+				returnList.add(BuildFromDataRow(temp.get(i)));
+			}
 		}
 		catch(Exception ex)
 		{
@@ -132,17 +172,17 @@ public class Cargo extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Cargo BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Cargo BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Cargo c = new Cargo(rs.getInt("ShipID"));
+		Cargo c = new Cargo((Integer)data.get("ShipID"));//rs.getInt("ShipID"));
 		//b.setId();
-		c.setCargoName(rs.getString("ShipName"));
-		c.setCapacity(rs.getInt("Capacity"));
-		c.setContractor(rs.getString("Contractor"));
-		c.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
-		c.setCargoType(rs.getString("ShipType"));
-		c.setStatus(rs.getString("Status"));
-		c.setNumOfContainers(rs.getInt("NoOfContainers"));
+		c.setCargoName((String)data.get("ShipName"));//rs.getString("ShipName"));
+		c.setCapacity((Integer)data.get("Capacity"));//rs.getInt("Capacity"));
+		c.setContractor((String)data.get("Contractor"));//rs.getString("Contractor"));
+		c.setLocation(Double.parseDouble(data.get("Latitude").toString()), Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));//rs.getString("LocationName"));
+		c.setCargoType((String)data.get("ShipType"));//rs.getString("ShipType"));
+		c.setStatus((String)data.get("Status"));//rs.getString("Status"));
+		c.setNumOfContainers((Integer)data.get("NoOfContainer"));//rs.getInt("NoOfContainers"));
 		c.MarkClean();
 		return c;
 		

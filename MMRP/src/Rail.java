@@ -1,7 +1,7 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Rail extends Vehicle {
 
@@ -74,14 +74,54 @@ public class Rail extends Vehicle {
 	@Override
 	public void Update() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
+			{
+				executeCommand("Insert into rail (RailName,Contractor,Longitude,Latitude,LocationName,RailType,Capacity,Status) Values ('"+
+						getRailName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getRailType()+ "','"+
+						this.getCapacity()+"','"+this.getStatus()+"')");
+				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select RailID from rai where RailName = '" + this.getRailName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND RailType = '" + this.getRailType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus()+"'");
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("RailID");
+					MarkClean();
+					MarkOld();
+				}
+			}
+			else
+			{
+				if(isDirty())
+				{
+					executeCommand("Update Rail Set RailName = '" + this.getRailName() + "' , Contractor = '"+this.getContractor()+
+						"' , Longitude = '" + this.getLongitude() + "' , Latitude = '" + this.getLatitude() + "' , LocationName = '" + this.getLocationName() + 
+						"' , RailType = '" + this.getRailType() + "' , Capacity = '" +this.getCapacity() + "' , Status = '" + this.getStatus() + "' Where RailID = " +this.id);
+					MarkClean();
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 		
 	}
 
 	@Override
 	public  void Delete() 
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			executeCommand("Delete from Rail Where RailID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 
 	}
 
@@ -89,10 +129,9 @@ public class Rail extends Vehicle {
 	{
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Rail where RailID = " + id);
-			if(rs.next())
-				return BuildFromDataRow(rs);
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Rail where RailID = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
 			return null;
 		}
 		catch(Exception ex)
@@ -106,10 +145,9 @@ public class Rail extends Vehicle {
 		ArrayList<Rail> returnList = new ArrayList<Rail>();
 		try 
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Rail " +  where);
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Rail " +  where);
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -117,16 +155,16 @@ public class Rail extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Rail BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Rail BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Rail r = new Rail(rs.getInt("RailID"));
+		Rail r = new Rail((Integer)data.get("RailID"));
 		//b.setId();
-		r.setRailName(rs.getString("RailName"));
-		r.setCapacity(rs.getInt("Capacity"));
-		r.setContractor(rs.getString("Contractor"));
-		r.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
-		r.setRailType(rs.getString("RailType"));
-		r.setStatus(rs.getString("Status"));		
+		r.setRailName((String)data.get("RailName"));
+		r.setCapacity((Integer)data.get("Capacity"));
+		r.setContractor((String)data.get("Contractor"));
+		r.setLocation(Double.parseDouble(data.get("Latitude").toString()), Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));
+		r.setRailType((String)data.get("RailType"));
+		r.setStatus((String)data.get("Status"));		
 		r.MarkClean();
 		return r;
 		

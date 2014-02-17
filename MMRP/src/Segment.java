@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 import java.sql.*;
 
 
@@ -152,7 +153,15 @@ public class Segment extends BaseClass {
 			MarkDirty();
 		}
 	}
-	public Vehicle getVehcle()
+	public int getVehicleID()
+	{
+		return this.VehicleID;
+	}
+	public String getTravelMode()
+	{
+		return this.mode;
+	}
+	public Vehicle getVehicle()
 	{
 		switch(Vehicle.loadType(mode))
 		{
@@ -175,14 +184,11 @@ public class Segment extends BaseClass {
 		ArrayList<Segment> returnList = new ArrayList<Segment>();
 		try
 		{
-			Connection c =getConnection();
-			Statement stm = c.createStatement();
-			ResultSet rs = stm.executeQuery("Select * from Segment " + where);
+			ArrayList<Map<String,Object>> temp=executeQuery("Select * from Segment " + where);
 			
-			while(rs.next())
-			{
-				returnList.add(BuildFromDataRow(rs));
-			}
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
+			
 		}
 		catch(Exception ex)
 		{
@@ -190,25 +196,25 @@ public class Segment extends BaseClass {
 		}
 		return returnList;
 	}
-	public static Segment BuildFromDataRow(ResultSet rs) throws SQLException
+	public static Segment BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
-		Segment s = new Segment(rs.getInt("SegmentID"));
+		Segment s = new Segment((Integer)data.get("SegmentID"));//rs.getInt("SegmentID"));
 		//s.id=;
-		s.setStartLocation(rs.getInt("FromLocationID"));
+		s.setStartLocation((Integer)data.get("FromLocationID"));//rs.getInt("FromLocationID"));
 		//s.fromID=rs.getInt("FromLocationID");
-		s.setEndLocation(rs.getInt("ToLocationID"));
+		s.setEndLocation((Integer)data.get("ToLocationID"));//rs.getInt("ToLocationID"));
 		//s.toID=rs.getInt("ToLocationID");
 		//s.VehicleID=rs.getInt("VehicleID");
-		s.setVehicle(rs.getInt("VehicleID"), rs.getString("ModeType"));
+		s.setVehicle((Integer)data.get("VehicleID"),(String)data.get("ModeType"));//rs.getString("ModeType"));
 		//s.mode=rs.getString("ModeType");
 		//s.distance=rs.getDouble("Distance");
-		s.setDistance(rs.getDouble("Distance"));
-		s.setCost(rs.getDouble("Cost"));
+		s.setDistance(Double.parseDouble(data.get("Distance").toString()));//rs.getDouble("Distance"));
+		s.setCost(Double.parseDouble(data.get("Cost").toString()));//;rs.getDouble("Cost"));
 		//s.cost=rs.getDouble("Cost");
-		s.setDepartureTime(rs.getInt("TimeOfDeparture"));
+		s.setDepartureTime((Integer)data.get("TimeOfDeparture"));//rs.getInt("TimeOfDeparture"));
 		//s.departureTime=rs.getInt("TimeOfDeparture");
 		//s.arrivalTime=rs.getInt("TimeOfArrival");
-		s.setArrivalTime(rs.getInt("TimeOfArrival"));
+		s.setArrivalTime((Integer)data.get("TimeOfArrival"));//rs.getInt("TimeOfArrival"));
 		s.MarkClean();
 		return s;
 	}
@@ -218,10 +224,9 @@ public class Segment extends BaseClass {
 		ArrayList<Segment> returnList = new ArrayList<Segment>();
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Segment where FromLocationID = '" + l.getID() +"'");
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>>temp=executeQuery("Select * from Segment where FromLocationID = '" + l.getID() +"'");
+			for(int i = 0 ; i < temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -235,10 +240,9 @@ public class Segment extends BaseClass {
 		ArrayList<Segment> returnList = new ArrayList<Segment>();
 		try
 		{
-			Connection c = getConnection();
-			ResultSet rs = c.createStatement().executeQuery("Select * from Segment where FromLocationID = '" + l.getID() + "' and TimeOfDeparture > " + startTime);
-			while(rs.next())
-				returnList.add(BuildFromDataRow(rs));
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Segment where FromLocationID = '" + l.getID() + "' and TimeOfDeparture > " + startTime);
+			for(int i = 0; i < temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
 		}
 		catch(Exception ex)
 		{
@@ -246,26 +250,82 @@ public class Segment extends BaseClass {
 		}
 		return returnList;
 	}
-	
-	@Override
-	void Update() {
-		if(isNew())
+	public static Segment Load(int id)
+	{
+		try
 		{
-		
+			ArrayList<Map<String,Object>> temp= executeQuery("Select * from Segment where SegmentID = " +id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
+			return null;
 		}
-		else
+		catch(Exception ex)
 		{
-			if(isDirty())
+			System.out.println("Error " +ex);
+			return null;
+		}
+	}
+	@Override
+	public void Update() 
+	{
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
 			{
+				executeCommand("Insert into Segment (FromLocationID,ToLocationID,VehicleID,ModeType,Distance,Cost,TimeOfDeparture,TimeOfArrival) Values ('"+
+						this.getStartLocationID()+"','"+this.getEndLocationID()+"','"+this.getVehicleID()+"','"+this.getTravelMode()+"','"+this.getDistance()+"','"+
+						this.getCost()+"','" + this.getDepartureTime()+"','"+this.getArrivalTime()+"')");
 				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select SegmentID from Segment where FromLocationID ='"+ this.getStartLocationID()+"' "+
+						"AND ToLocationID ='" + this.getEndLocationID() +"' "+
+						"AND VehicleID='" + this.getVehicleID()+"' "+
+						"And ModeType='" + this.getTravelMode()+"' "+
+						"And Distance='"+this.getDistance()+"' "+
+						"And Cost ='"+this.getCost()+"' "+
+						"And TimeOfDeparture ='"+this.getDepartureTime()+"' "+
+						"And TimeOfArrival = '"+this.getArrivalTime()+"'");
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("SegmentID");
+					MarkClean();
+					MarkOld();
+				}
+			}
+			else
+			{
+				if(isDirty())
+				{
+					executeCommand("Update Segment Set FromLocationID ='"+ this.getStartLocationID()+"' "+
+							"AND ToLocationID ='" + this.getEndLocationID() +"' "+
+							"AND VehicleID='" + this.getVehicleID()+"' "+
+							"And ModeType='" + this.getTravelMode()+"' "+
+							"And Distance='"+this.getDistance()+"' "+
+							"And Cost ='"+this.getCost()+"' "+
+							"And TimeOfDeparture ='"+this.getDepartureTime()+"' "+
+							"And TimeOfArrival = '"+this.getArrivalTime()+"' Where SegmentID="+this.id);
+					MarkClean();
+				}
 			}
 		}
-
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		
 	}
 
 	@Override
-	void Delete() {
-		// TODO Auto-generated method stub
+	public  void Delete() 
+	{
+		try
+		{
+			executeCommand("Delete from Bike Where BikeID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
 
 	}
 	@Override
