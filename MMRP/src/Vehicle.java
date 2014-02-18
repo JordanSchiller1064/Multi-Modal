@@ -19,7 +19,7 @@ public abstract class Vehicle extends BaseClass {
 			{
 				return type;
 			}
-			
+
 	}
 	public static enum Contractors 
 	{
@@ -64,7 +64,7 @@ public abstract class Vehicle extends BaseClass {
 	protected Status status;
 	protected TravelTypes type;
 	protected int id;
-	
+	private ArrayList<Shipment> shipments;
 	protected void setTravelType(TravelTypes t)
 	{
 		if(type==null || !type.equals(t))
@@ -280,6 +280,35 @@ public abstract class Vehicle extends BaseClass {
 		return Segment.LoadAll("where ModeType = '"+type.toString()+"' and VehicleID= " + id);
 	}
 
-
+	public void LoadAtLocation(Location L)
+	{
+		if(shipments==null)
+		{
+			shipments=new ArrayList<Shipment>();
+		}
+		//load all shipments to be loaded on to the vehicle at said location
+	}
+	public void UnLoadAtLocation(Location l)
+	{
+		if(shipments==null || shipments.size()==0)
+		{
+			return;
+		}
+		//remove all shipments that get off at this location
+	}
+	
+	public void LoadShipment(Shipment s)
+	{
+		if(shipments==null)
+		{
+			shipments=new ArrayList<Shipment>();
+		}
+		//todo Check capacity restraints... remove lower priorty shipment if necessary
+		shipments.add(s);
+	}
+	public void RemoveShipment(Shipment s)
+	{
+		shipments.remove(s);
+	}
 
 }

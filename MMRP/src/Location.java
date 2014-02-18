@@ -7,10 +7,11 @@ public class Location extends BaseClass {
 	private double latitude;
 	private double longitude;
 	private String name;
-	
+	private ArrayList<Vehicle> vehiclesAtLocation;
 	public Location()
 	{
 		travelTypes=new ArrayList<Vehicle.TravelTypes>();
+		vehiclesAtLocation=new ArrayList<Vehicle>();
 		MarkNew();
 	}
 	public Location(int id)
@@ -216,6 +217,14 @@ public class Location extends BaseClass {
 		temp.MarkClean();
 		
 		return temp;
+	}
+	public void VehcileArriving(Vehicle v)
+	{
+		this.vehiclesAtLocation.add(v);
+	}
+	public void VehicleDeparting(Vehicle v)
+	{
+		this.vehiclesAtLocation.remove(v);
 	}
 
 }
