@@ -65,6 +65,7 @@ public abstract class Vehicle extends BaseClass {
 	protected TravelTypes type;
 	protected int id;
 	private ArrayList<Shipment> shipments;
+	private ArrayList<Segment> schedule;
 	protected void setTravelType(TravelTypes t)
 	{
 		if(type==null || !type.equals(t))
@@ -277,7 +278,9 @@ public abstract class Vehicle extends BaseClass {
 	
 	public ArrayList<Segment> getSchedule()
 	{
-		return Segment.LoadAll("where ModeType = '"+type.toString()+"' and VehicleID= " + id);
+		if(schedule==null)
+			schedule=Segment.LoadAll("where ModeType = '"+type.toString()+"' and VehicleID= " + id);
+		return schedule;
 	}
 
 	public void LoadAtLocation(Location L)

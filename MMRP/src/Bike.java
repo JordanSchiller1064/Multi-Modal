@@ -130,7 +130,11 @@ public class Bike extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Bike where BikeID = " + id);
 			if(temp.size()>0)
-				return BuildFromDataRow(temp.get(0));
+			{
+				Bike b = BuildFromDataRow(temp.get(0));
+				b.getSchedule();
+				return b;
+			}
 			return null;
 		}
 		catch(Exception ex)
@@ -147,7 +151,11 @@ public class Bike extends Vehicle {
 			
 			ArrayList<Map<String,Object>> temp =executeQuery("Select * from Bike " +  where);
 			for(int i = 0; i<temp.size();i++)
-				returnList.add(BuildFromDataRow(temp.get(i)));
+			{
+				Bike  b = BuildFromDataRow(temp.get(i));
+				b.getSchedule();
+				returnList.add(b);
+			}
 		}
 		catch(Exception ex)
 		{

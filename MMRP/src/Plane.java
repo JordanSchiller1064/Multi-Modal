@@ -131,7 +131,12 @@ public class Plane extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp= executeQuery("Select * from Plane where PlaneID = " + id);
 			if(temp.size()>0)
-				return BuildFromDataRow(temp.get(0));
+			{
+				
+				Plane p = BuildFromDataRow(temp.get(0));
+				p.getSchedule();
+				return p;
+			}
 			return null;
 		}
 		catch(Exception ex)
@@ -147,7 +152,11 @@ public class Plane extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Plane " +  where);
 			for(int i = 0; i<temp.size();i++)
-				returnList.add(BuildFromDataRow(temp.get(i)));
+			{
+				Plane p = BuildFromDataRow(temp.get(i));
+				p.getSchedule();
+				returnList.add(p);
+			}
 		}
 		catch(Exception ex)
 		{

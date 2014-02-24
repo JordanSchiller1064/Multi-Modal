@@ -146,7 +146,11 @@ public class Cargo extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp = executeQuery("Select * from ship where ShipID = " + id);
 			if(temp.size()>0)
-				return BuildFromDataRow(temp.get(0));
+			{
+				Cargo c = BuildFromDataRow(temp.get(0));
+				c.getSchedule();
+				return c;
+			}
 			return null;
 		}
 		catch(Exception ex)
@@ -163,7 +167,9 @@ public class Cargo extends Vehicle {
 			ArrayList<Map<String,Object>> temp = executeQuery("Select * from ship " +  where);
 			for(int i = 0 ; i<temp.size();i++)
 			{
-				returnList.add(BuildFromDataRow(temp.get(i)));
+				Cargo c = BuildFromDataRow(temp.get(i));
+				c.getSchedule();
+				returnList.add(c);
 			}
 		}
 		catch(Exception ex)

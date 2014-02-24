@@ -315,6 +315,19 @@ public class Segment extends BaseClass {
 		
 	}
 
+	public int estimateCapacity()
+	{
+		try
+		{
+			ArrayList<Map<String,Object>> temp = executeQuery("Select Sum(Size)as Capacity from Shipment where ShipmentID IN (Select Distinct ShipmentID where SegmentID = " + this.id);
+			return (Integer)temp.get(0).get("Capacity");
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+			return -1;
+		}
+	}
 	@Override
 	public  void Delete() 
 	{

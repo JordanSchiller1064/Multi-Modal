@@ -131,7 +131,11 @@ public class Rail extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Rail where RailID = " + id);
 			if(temp.size()>0)
-				return BuildFromDataRow(temp.get(0));
+			{
+				Rail r = BuildFromDataRow(temp.get(0));
+				r.getSchedule();
+				return r;
+			}
 			return null;
 		}
 		catch(Exception ex)
@@ -147,7 +151,11 @@ public class Rail extends Vehicle {
 		{
 			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Rail " +  where);
 			for(int i = 0; i<temp.size();i++)
-				returnList.add(BuildFromDataRow(temp.get(i)));
+			{
+				Rail r = BuildFromDataRow(temp.get(i));
+				r.getSchedule();
+				returnList.add(r);
+			}
 		}
 		catch(Exception ex)
 		{
