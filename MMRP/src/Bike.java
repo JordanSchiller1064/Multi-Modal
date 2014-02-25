@@ -163,7 +163,7 @@ public class Bike extends Vehicle {
 		}
 		return returnList;
 	}
-	public static Bike BuildFromDataRow(Map<String,Object> data) throws SQLException
+	private static Bike BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
 		Bike b = new Bike((Integer)data.get("BikeID"));//rs.getInt("BikeID"));
 		b.setBikeName((String)data.get("BikeName"));//rs.getString("BikeName"));
