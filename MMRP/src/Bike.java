@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Bike extends Vehicle {
+	//enum
 	public static enum BikeType 
 	{
 			Standard("Standard"),
