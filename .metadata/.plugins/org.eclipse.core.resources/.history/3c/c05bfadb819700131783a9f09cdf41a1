@@ -1,0 +1,38 @@
+import java.sql.*;
+import java.util.ArrayList;
+public class Test extends BaseClass 
+{
+	public Test()
+	{
+	}
+	
+	public Test Load(){return null;}
+	public void Update(){};
+	public void Delete(){};
+	public void printRandmonness()
+	{
+
+	}
+	public static void main(String[] args)
+	{
+		//Truck test = Truck.Load(1);
+		//System.out.println(test.getVehicleName());
+		ArrayList<Truck> b = Truck.LoadAll("");
+		Truck t = Truck.Load(1);
+		//ArrayList<Segment> sched =test.getSchedule();
+		for(int i = 0 ; i<b.size();i++)
+		{
+			System.out.println(t.getTruckName() + "\t" );
+		}
+		t.setTruckName("Chris Truck");
+		t.Update();
+		ArrayList<Truck> b1 = Truck.LoadAll("");
+		Truck t1 = Truck.Load(1);
+		//ArrayList<Segment> sched =test.getSchedule();
+		for(int i = 0 ; i<b.size();i++)
+		{
+			System.out.println(t1.getTruckName() + "\t" );
+		}
+	}
+
+}

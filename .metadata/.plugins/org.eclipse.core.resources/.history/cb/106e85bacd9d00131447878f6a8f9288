@@ -1,0 +1,7 @@
+package Routing;
+import 
+public class AStarNode 
+{
+
+	private Location l;
+}

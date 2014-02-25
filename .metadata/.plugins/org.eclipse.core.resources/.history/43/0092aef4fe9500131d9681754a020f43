@@ -1,0 +1,16 @@
+
+public class Rail extends Vehicle {
+
+	@Override
+	void Update() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	void Delete() {
+		// TODO Auto-generated method stub
+
+	}
+
+}

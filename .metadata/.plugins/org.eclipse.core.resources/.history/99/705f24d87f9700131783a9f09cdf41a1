@@ -1,0 +1,179 @@
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
+
+public class Plane extends Vehicle {
+
+	public static enum PlaneType 
+	{
+			Standard("Standard"),
+			Other("OTHER");
+			private String type;
+			PlaneType(String s)
+			{
+				type=s;
+			}
+			@Override public String toString()
+			{
+				return type;
+			}
+			
+	}
+	private PlaneType type;
+	public Plane()
+	{
+		setTravelType(TravelTypes.Plane);
+		MarkNew();
+	}	
+	public Plane(int id)
+	{
+		setTravelType(TravelTypes.Plane);
+		this.id=id;
+	}	
+	
+	public void setPlaneName(String s)
+	{
+		if(name==null || !this.name.equals(s))
+		{
+			super.setVehicleName(s);
+		}
+		
+	}
+	public String getPlaneName()
+	{
+		return super.getVehicleName();
+	}
+	public void setPlaneType(PlaneType s)
+	{
+		if(type==null || !this.type.equals(s))
+		{
+			type = s;
+			MarkDirty();
+		}
+	}
+	public void setPlaneType(String s)
+	{
+		if(type==null || !this.type.toString().equals(s))
+		{
+			type = loadPlaneType(s);
+			MarkDirty();
+		}
+	}
+	public String getPlaneType()
+	{
+		return type.toString();
+	}
+	private PlaneType loadPlaneType(String s)
+	{
+		if(s.equals(PlaneType.Standard.toString()))
+			return PlaneType.Standard;
+		return PlaneType.Other;
+			
+	}
+	@Override
+	public void Update() 
+	{
+		try
+		{
+			//toDo: set id on insert set update statement
+			if(isNew())
+			{
+				executeCommand("Insert into Plane (PlaneName,Contractor,Longitude,Latitude,LocationName,PlaneType,Capacity,Status) Values ('"+
+						getPlaneName() + "','" + getContractor() + "','"+ this.getLongitude()+"','"+this.getLatitude() + "','" + this.getLocationName() + "','" + this.getPlaneType()+ "','"+
+						this.getCapacity()+"','"+this.getStatus()+"')");
+				
+				ArrayList<Map<String,Object>> temp =executeQuery("Select PlaneID from Plane where PlaneName = '" + this.getPlaneName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND PlaneType = '" + this.getPlaneType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus());
+				if(temp.size()>0)
+				{
+					this.id = (Integer)temp.get(0).get("PlaneID");
+					MarkClean();
+					MarkOld();
+				}
+			}
+			else
+			{
+				if(isDirty())
+				{
+					executeCommand("Update Plane Set PlaneName = '" + this.getPlaneName() + "' AND Contractor = '"+this.getContractor()+
+						"' AND Longitude = '" + this.getLongitude() + "' AND Latitude = '" + this.getLatitude() + "' AND LocationName = '" + this.getLocationName() + 
+						"' AND PlaneType = '" + this.getPlaneType() + "' AND Capacity = '" +this.getCapacity() + "' AND Status = '" + this.getStatus() + "Where Plane = " +this.id);
+					MarkClean();
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		
+	}
+
+	@Override
+	public  void Delete() 
+	{
+		try
+		{
+			executeCommand("Delete from Plane Where PlaneID = " + this.id);
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+
+	}
+
+	public static Plane Load(int id)
+	{
+		try
+		{
+			ArrayList<Map<String,Object>> temp= executeQuery("Select * from Plane where PlaneID = " + id);
+			if(temp.size()>0)
+				return BuildFromDataRow(temp.get(0));
+			return null;
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+ 		return null;
+	}
+	public static ArrayList<Plane> LoadAll(String where)
+	{
+		ArrayList<Plane> returnList = new ArrayList<Plane>();
+		try 
+		{
+			ArrayList<Map<String,Object>> temp = executeQuery("Select * from Plane " +  where);
+			for(int i = 0; i<temp.size();i++)
+				returnList.add(BuildFromDataRow(temp.get(i)));
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		return returnList;
+	}
+	public static Plane BuildFromDataRow(Map<String,Object> data) throws SQLException
+	{
+		Plane p = new Plane((Integer)data.get("BikeID"));//rs.getInt("BikeID"));
+		p.setPlaneName((String)data.get("BikeName"));//rs.getString("BikeName"));
+		p.setCapacity((Integer)data.get("Capacity"));//rs.getInt("Capacity"));
+		p.setContractor((String)data.get("Contractor"));//rs.getString("Contractor"));
+		p.setLocation(Double.parseDouble(data.get("Latitude").toString()),Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));
+		p.setPlaneType((String)data.get("BikeType"));//rs.getString("BikeType"));
+		p.setStatus((String)data.get("Status"));//rs.getString("Status"));		
+		p.MarkClean();
+		return p;
+		
+	}
+	@Override
+	public String toString()
+	{
+		return getPlaneName();
+	}
+
+
+}

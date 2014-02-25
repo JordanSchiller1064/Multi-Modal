@@ -1,0 +1,147 @@
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class Bike extends Vehicle {
+	public static enum BikeType 
+	{
+			Standard("Standard"),
+			Other("OTHER");
+			private String type;
+			BikeType(String s)
+			{
+				type=s;
+			}
+			@Override public String toString()
+			{
+				return type;
+			}
+			
+	}
+	private BikeType type;
+	public Bike()
+	{
+		setTravelType(TravelTypes.Bike);
+		MarkNew();
+	}	
+	public Bike(int id)
+	{
+		setTravelType(TravelTypes.Bike);
+		this.id=id;
+	}	
+	
+	public void setBikeName(String s)
+	{
+		if(name==null)
+		{
+			super.setVehicleName(s);
+		}
+		else
+		{
+			if(!this.name.equals(s))
+				super.setVehicleName(s);
+		}
+	}
+	public String getBikeName()
+	{
+		return super.getVehicleName();
+	}
+	public void setBikeType(BikeType s)
+	{
+		if(!this.type.equals(s))
+		{
+			type = s;
+			MarkDirty();
+		}
+	}
+	public void setBikeType(String s)
+	{
+		if(!this.type.toString().equals(s))
+		{
+			type = loadBikeType(s);
+			MarkDirty();
+		}
+	}
+	public String getTruckType()
+	{
+		return type.toString();
+	}
+	private BikeType loadBikeType(String s)
+	{
+		if(s.equals(BikeType.Standard.toString()))
+			return BikeType.Standard;
+		return BikeType.Other;
+			
+	}
+	@Override
+	public void Update() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public  void Delete() 
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	public static Bike Load(int id)
+	{
+		try
+		{
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Bike where BikeID = " + id);
+			if(rs.next())
+				return BuildFromDataRow(rs);
+			return null;
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+ 		return null;
+	}
+	public static ArrayList<Bike> LoadAll(String where)
+	{
+		ArrayList<Bike> returnList = new ArrayList<Bike>();
+		try 
+		{
+			Connection c = getConnection();
+			ResultSet rs = c.createStatement().executeQuery("Select * from Bike " +  where);
+			while(rs.next())
+				returnList.add(BuildFromDataRow(rs));
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Error " + ex);
+		}
+		return returnList;
+	}
+	public static Bike BuildFromDataRow(ResultSet rs) throws SQLException
+	{
+		Bike b = new Bike();
+		b.setId(rs.getInt("BikeID"));
+		b.setBikeName(rs.getString("BikeName"));
+		b.setCapacity(rs.getInt("Capacity"));
+		b.setContractor(rs.getString("Contractor"));
+		b.setLocation(rs.getDouble("Latitude"), rs.getDouble("Longitude"),rs.getString("LocationName"));
+		b.setBikeType(rs.getString("BikeType"));
+		b.setStatus(rs.getString("Status"));		
+		b.MarkClean();
+		return b;
+		
+	}
+	@Override
+	public String toString()
+	{
+		return getBikeName();
+	}
+	public static void main(String[] args)
+	{
+	
+	}
+
+}
