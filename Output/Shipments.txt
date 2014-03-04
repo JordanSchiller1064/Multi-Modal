@@ -1,0 +1,164 @@
+Shipment 1	 Earliest: 40	 Latest: 45
+	 Start:Rotterdam End: Frankfurt
+		Segment id 136
+			Rotterdam	Frankfurt
+	Arrival: 34
+Shipment 2	 Earliest: 20	 Latest: 45
+	 Start:Rotterdam End: Antwerp
+		Segment id 122
+			Rotterdam	Antwerp
+	Arrival: 44
+Shipment 3	 Earliest: 120	 Latest: 130
+	 Start:Frankfurt End: Antwerp
+		Segment id 137
+			Frankfurt	Paris
+		Segment id 148
+			Paris	Antwerp
+	Arrival: 60
+Shipment 4	 Earliest: 50	 Latest: 55
+	 Start:New York City End: Rotterdam
+		Segment id 120
+			New York City	Paris
+		Segment id 121
+			Paris	Rotterdam
+	Arrival: 34
+Shipment 5	 Earliest: 45	 Latest: 90
+	 Start:New York City End: Frankfurt
+		Segment id 120
+			New York City	Paris
+		Segment id 148
+			Paris	Antwerp
+		Segment id 149
+			Antwerp	Frankfurt
+	Arrival: 81
+Shipment 6	 Earliest: 50	 Latest: 55
+	 Start:Pittsburgh End: Miami
+		Segment id 128
+			Pittsburgh	Mempis
+		Segment id 129
+			Mempis	Miami
+	Arrival: 52
+Shipment 7	 Earliest: 60	 Latest: 150
+	 Start:Pittsburgh End: Rotterdam
+Shipment 8	 Earliest: 70	 Latest: 75
+	 Start:New York City End: Pittsburgh
+		Segment id 132
+			New York City	Mobile
+		Segment id 155
+			Mobile	Pittsburgh
+	Arrival: 86
+Shipment 9	 Earliest: 40	 Latest: 50
+	 Start:Rotterdam End: Copenhagen
+		Segment id 125
+			Rotterdam	Paris
+		Segment id 126
+			Paris	Copenhagen
+	Arrival: 50
+Shipment 10	 Earliest: 40	 Latest: 80
+	 Start:Antwerp End: Frankfurt
+		Segment id 149
+			Antwerp	Frankfurt
+	Arrival: 81
+Shipment 11	 Earliest: 20	 Latest: 50
+	 Start:Mobile End: Pittsburgh
+		Segment id 155
+			Mobile	Pittsburgh
+	Arrival: 86
+Shipment 12	 Earliest: 50	 Latest: 65
+	 Start:Mempis End: New York City
+		Segment id 109
+			Mempis	Pittsburgh
+		Segment id 110
+			Pittsburgh	Mobile
+		Segment id 111
+			Mobile	New York City
+	Arrival: 41
+Shipment 13	 Earliest: 25	 Latest: 50
+	 Start:Mempis End: Miami
+		Segment id 129
+			Mempis	Miami
+	Arrival: 52
+Shipment 14	 Earliest: 10	 Latest: 70
+	 Start:Miami End: Paris
+Shipment 15	 Earliest: 25	 Latest: 50
+	 Start:Miami End: New York City
+		Segment id 118
+			Miami	New York City
+	Arrival: 30
+Shipment 16	 Earliest: 40	 Latest: 55
+	 Start:Antwerp End: Mobile
+		Segment id 124
+			Antwerp	Rotterdam
+		Segment id 170
+			Rotterdam	Mobile
+	Arrival: 351
+Shipment 17	 Earliest: 30	 Latest: 55
+	 Start:Mobile End: New York City
+		Segment id 111
+			Mobile	New York City
+	Arrival: 41
+Shipment 18	 Earliest: 65	 Latest: 75
+	 Start:Mempis End: Paris
+Shipment 19	 Earliest: 60	 Latest: 70
+	 Start:Mobile End: Frankfurt
+Shipment 20	 Earliest: 80	 Latest: 85
+	 Start:Frankfurt End: Copenhagen
+		Segment id 147
+			Frankfurt	Paris
+		Segment id 126
+			Paris	Copenhagen
+	Arrival: 50
+Shipment 21	 Earliest: 40	 Latest: 60
+	 Start:Copenhagen End: Rotterdam
+		Segment id 135
+			Copenhagen	Rotterdam
+	Arrival: 21
+Shipment 22	 Earliest: 60	 Latest: 75
+	 Start:Copenhagen End: New York City
+		Segment id 105
+			Copenhagen	Rotterdam
+		Segment id 106
+			Rotterdam	Frankfurt
+		Segment id 115
+			Frankfurt	New York City
+	Arrival: 44
+Shipment 23	 Earliest: 80	 Latest: 85
+	 Start:Antwerp End: Copenhagen
+		Segment id 124
+			Antwerp	Rotterdam
+		Segment id 125
+			Rotterdam	Paris
+		Segment id 126
+			Paris	Copenhagen
+	Arrival: 50
+Shipment 24	 Earliest: 60	 Latest: 65
+	 Start:Pittsburgh End: Copenhagen
+Shipment 25	 Earliest: 100	 Latest: 110
+	 Start:Mobile End: Copenhagen
+Shipment 26	 Earliest: 80	 Latest: 90
+	 Start:Paris End: New York City
+Shipment 27	 Earliest: 45	 Latest: 75
+	 Start:Paris End: Copenhagen
+		Segment id 126
+			Paris	Copenhagen
+	Arrival: 50
+Shipment 28	 Earliest: 80	 Latest: 115
+	 Start:Pittsburgh End: Paris
+Shipment 29	 Earliest: 60	 Latest: 85
+	 Start:Mobile End: New York City
+		Segment id 117
+			Mobile	Miami
+		Segment id 130
+			Miami	New York City
+	Arrival: 77
+Shipment 30	 Earliest: 50	 Latest: 75
+	 Start:Antwerp End: Miami
+		Segment id 124
+			Antwerp	Rotterdam
+		Segment id 106
+			Rotterdam	Frankfurt
+		Segment id 115
+			Frankfurt	New York City
+		Segment id 168
+			New York City	Miami
+	Arrival: 203
