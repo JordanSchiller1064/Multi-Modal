@@ -230,7 +230,7 @@ public class Cargo extends Vehicle {
 		c.setLocation(Double.parseDouble(data.get("Latitude").toString()), Double.parseDouble(data.get("Longitude").toString()),(String)data.get("LocationName"));//rs.getString("LocationName"));
 		c.setCargoType((String)data.get("ShipType"));//rs.getString("ShipType"));
 		c.setStatus((String)data.get("Status"));//rs.getString("Status"));
-		c.setNumOfContainers((Integer)data.get("NoOfContainer"));//rs.getInt("NoOfContainers"));
+		c.setNumOfContainers((Integer)data.get("NoOfContainers"));//rs.getInt("NoOfContainers"));
 		c.MarkClean();
 		return c;
 		

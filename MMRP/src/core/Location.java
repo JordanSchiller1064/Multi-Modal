@@ -190,7 +190,7 @@ public class Location extends BaseClass {
 	}
 	private static Location BuildFromDataRow(Map<String,Object> data)throws SQLException
 	{
-		Location temp = new Location((Integer)data.get("LocationId"));
+		Location temp = new Location((Integer)data.get("LocationID"));
 		temp.setLatitude(Double.parseDouble(data.get("Latitude").toString()));
 		temp.setLongitude(Double.parseDouble(data.get("Longitude").toString()));
 		temp.setName((String)data.get("Name"));//rs.getString("Name"));

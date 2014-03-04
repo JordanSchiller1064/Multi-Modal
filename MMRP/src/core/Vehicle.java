@@ -53,6 +53,11 @@ public abstract class Vehicle extends BaseClass {
 			
 	}//End of Contractors enumeration
 	
+	//Modifier Variables For Each Carrier.  Tries to introduce real world differences between contractors
+	public static double [] COST_MODIFIER_PLANE = {0.8,0.9,1.0,1.1,1.2};
+	
+	
+	
 	//This is an enumeration for the different states that a vehicle may find itself in
 	public static enum Status
 	{
@@ -347,6 +352,11 @@ public abstract class Vehicle extends BaseClass {
 		return schedule;
 	}
 
+	public void addToSchedule(Segment s)
+	{
+		schedule.add(s);
+		s.Update();
+	}
 	public void LoadAtLocation(Location L)
 	{
 		if(shipments==null)

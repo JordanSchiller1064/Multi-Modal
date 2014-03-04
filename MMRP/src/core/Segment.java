@@ -427,8 +427,11 @@ public class Segment extends BaseClass {
 	{
 		try
 		{
-			ArrayList<Map<String,Object>> temp = executeQuery("Select Sum(Size)as Capacity from Shipment where ShipmentID IN (Select Distinct ShipmentID where SegmentID = " + this.id);
+			ArrayList<Map<String,Object>> temp = executeQuery("Select Sum(Size)as Capacity from Shipment where ShipmentID IN (Select Distinct ShipmentID from ShipmentHistory where SegmentID = " + this.id+")");
+			if(temp.get(0).get("Capacity")!=null)
 			return (Integer)temp.get(0).get("Capacity");
+			else
+				return 0;
 		}
 		catch(Exception ex)
 		{

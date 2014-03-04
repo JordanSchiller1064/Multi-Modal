@@ -12,7 +12,7 @@ public class AStarAlg {
 	double costRatio;
 	double timeRatio;
 	
-	
+	AStarNode best=null;
 	public AStarAlg(Shipment s)
 	{
 		shpmnt=s;
@@ -48,16 +48,48 @@ public class AStarAlg {
 			leafs.remove(currentLeaf);
 			if(currentLeaf.getLocationID()==shpmnt.getToLocationID())
 			{
-				while(currentLeaf!=null)
+				if(Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() > shpmnt.getLatestTime() || Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() < shpmnt.getEarliestTime() )
 				{
-					if(currentLeaf.getSegmentID()!=-1)
-						returnPath.add(0,Segment.Load(currentLeaf.getSegmentID()));
-					currentLeaf=currentLeaf.getPrevious();
+					int currentDif;
+					if(best!=null)
+					{
+						if(Segment.Load(best.getSegmentID()).getArrivalTime() > shpmnt.getLatestTime())
+							currentDif=Math.abs(Segment.Load(best.getSegmentID()).getArrivalTime() - shpmnt.getLatestTime());
+						else
+							currentDif = Math.abs(Segment.Load(best.getSegmentID()).getArrivalTime() - shpmnt.getEarliestTime());
+					}
+					else
+						currentDif=0;
+					int thisDif;
+					if(Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() > shpmnt.getLatestTime())// Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() < shpmnt.getEarliestTime() )
+						thisDif=Math.abs(Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() - shpmnt.getLatestTime());
+					else
+						thisDif = Math.abs(Segment.Load(currentLeaf.getSegmentID()).getArrivalTime() - shpmnt.getEarliestTime());
+					
+					if(best==null || thisDif<currentDif)
+					{
+						best=currentLeaf;
+					}
+					if(leafs.size()>0)
+					{
+						currentLeaf=leafs.get(0);
+						for(int i =1; i<leafs.size();i++)
+							currentLeaf = (currentLeaf.getCost()>leafs.get(i).getCost())?leafs.get(i):currentLeaf;
+					}
 				}
-				return returnPath;
+				else
+				{
+					while(currentLeaf!=null)
+					{
+						if(currentLeaf.getSegmentID()!=-1)
+							returnPath.add(0,Segment.Load(currentLeaf.getSegmentID()));
+						currentLeaf=currentLeaf.getPrevious();
+					}
+					return returnPath;
+				}
 			}
-			else
-			{
+			
+			
 				int startTime = (currentLeaf.getSegmentID()==-1)?shpmnt.getDepartureTime():Segment.Load(currentLeaf.getSegmentID()).getArrivalTime();
 				ArrayList<Segment> possibleDestinations = Segment.LoadAllAtLocation(currentLeaf.getLocationID(), startTime);
 				
@@ -68,9 +100,16 @@ public class AStarAlg {
 				//Check if lowerCost leaf to location already exists if not add/replace new leaf
 				checkCurrentLeafs(possibleDestinations,currentLeaf);
 				
-			}
+			
+		}
+		while(best!=null)
+		{
+			if(best.getSegmentID()!=-1)
+				returnPath.add(0,Segment.Load(best.getSegmentID()));
+			best=best.getPrevious();
 		}
 		return returnPath;
+		
 	}
 	
 	
@@ -133,25 +172,32 @@ public class AStarAlg {
 			
 			AStarNode temp = new AStarNode(test.getEndLocationID(),currentLeaf,test.getID(),cost);
 			AStarNode replace=null;
-			for(int j = 0; j<leafs.size();j++)
+			if(leafs.size()==0)
+				leafs.add(temp);
+			else
 			{
-				if(temp.getLocationID()==leafs.get(j).getLocationID())
+				for(int j = 0; j<leafs.size();j++)
 				{
-					if(temp.getCost()<leafs.get(j).getCost())
+					if(temp.getLocationID()==leafs.get(j).getLocationID())
 					{
-						replace=leafs.get(j);
-						leafs.add(temp);
-						
+						if(temp.getCost()<leafs.get(j).getCost())
+						{
+							replace=leafs.get(j);
+							leafs.add(temp);
+							
+						}
+						break;
 					}
-					break;
 				}
 			}
+			if(replace==null)
+				leafs.add(temp);
 			if(replace!=null)
 				leafs.remove(replace);
 			
 		}
 	}
-	public double getDistance(int one , int two)
+	public static double getDistance(int one , int two)
 	{
 		Location s = Location.Load(one);
 		Location e = Location.Load(two);

@@ -9,8 +9,9 @@ public class Shipment extends BaseClass {
 	private int fromLocationID,toLocationID;
 	private int priority;
 	private int size;
-	private int arrivalTime,departureTime;
+	private int earliest, latest;
 	private int id;
+	private int departureTime;
 	private ArrayList<ShipmentHistory> history;
 	public Shipment()
 	{
@@ -62,13 +63,23 @@ public class Shipment extends BaseClass {
 			MarkDirty();
 		}
 	}
-	public int getArrivalTime() {
-		return arrivalTime;
+	public int getEarliestTime() {
+		return earliest;
 	}
-	public void setArrivalTime(int arrivalTime) {
-		if(this.arrivalTime!=arrivalTime)
+	public void setEarliestTime(int time) {
+		if(this.earliest!=time)
 		{
-			this.arrivalTime = arrivalTime;
+			this.earliest = time;
+			MarkDirty();
+		}
+	}
+	public int getLatestTime() {
+		return latest;
+	}
+	public void setLatestTime(int time) {
+		if(this.latest!=time)
+		{
+			this.latest = time;
 			MarkDirty();
 		}
 	}
@@ -145,12 +156,13 @@ public class Shipment extends BaseClass {
 	public static Shipment BuildFromDataRow(Map<String,Object> data) throws SQLException
 	{
 		Shipment s = new Shipment((Integer)data.get("ShipmentID"));
-		s.setArrivalTime((Integer)data.get("ArrivalAtDestination"));
+		s.setEarliestTime((Integer)data.get("EarliestArrival"));
 		s.setDepartureTime((Integer)data.get("DepartureFromStart"));
 		s.setFromLocationID((Integer)data.get("FromLocationID"));
 		s.setPriority((Integer)data.get("Priority"));
 		s.setSize((Integer)data.get("Size"));
 		s.setToLocationID((Integer)data.get("ToLocationID"));
+		s.setLatestTime((Integer)data.get("LatestArrival"));
 		s.MarkClean();
 		return s;
 		
